@@ -130,6 +130,7 @@ public class CareGiverServiceImpl implements CareGiverService {
 	public CareGiver addCareGiver(FormDataDTO formDataDTO) {
 		CareGiver careGiver = modelMapper.map(formDataDTO, CareGiver.class);
 
+		if(careGiver.getCertificate()!=null) {
 		for (Certificate certificate : careGiver.getCertificate()) {
 			if (certificate.getCertificateId() == 0) {
 				certificateRepository.save(new Certification(certificate.getCertificateName()));
@@ -138,6 +139,8 @@ public class CareGiverServiceImpl implements CareGiverService {
 				issuingOrganizationRepository.save(new IssuingOrgranization(certificate.getOrganizationName()));
 			}
 		}
+		}
+		if(careGiver.getExperience()!=null) {
 		for (Experience experience : careGiver.getExperience()) {
 			if (experience.getRoleId() == 0) {
 				roleRepository.save(new Role(experience.getRoleName()));
@@ -145,6 +148,7 @@ public class CareGiverServiceImpl implements CareGiverService {
 			if (experience.getOrganizationId() == 0) {
 				organizationRepository.save(new Organization(experience.getOrganizationName()));
 			}
+		}
 		}
 		if (formDataDTO.getCareprovider() != null) {
 			for (Long careProvider : careGiver.getCareprovider()) {
