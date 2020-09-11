@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.qdm.cs.usermanagement.entity.Certificate;
+import com.qdm.cs.usermanagement.entity.Experience;
+import com.qdm.cs.usermanagement.entity.Specialization;
 import com.qdm.cs.usermanagement.enums.Status;
 
 import lombok.AllArgsConstructor;
@@ -42,8 +45,8 @@ public class FormDataDTO {
 	int officeNoISDCode;
 	long officeNo;
 	String licenseNo;
-	List<SpecializationDTO> specialization;
-	List<CertificateDTO> certificate;
-	List<ExperienceDTO> experience;
+	List<Specialization> specialization;
+	List<Certificate> certificate;
+	List<Experience> experience;
 
 }

@@ -197,6 +197,12 @@ public class CareGiverServiceImpl implements CareGiverService {
 					formDataDTO.getSkills() != null ? formDataDTO.getSkills() : careGiverUpdateDate.get().getSkills());
 			careGiverUpdateDate.get().setLicenseNo(formDataDTO.getLicenseNo() != null ? formDataDTO.getLicenseNo()
 					: careGiverUpdateDate.get().getLicenseNo());
+			careGiverUpdateDate.get().setSpecialization(formDataDTO.getSpecialization() != null ? formDataDTO.getSpecialization()
+					: careGiverUpdateDate.get().getSpecialization());
+			careGiverUpdateDate.get().setCertificate(formDataDTO.getCertificate() != null ? formDataDTO.getCertificate()
+					: careGiverUpdateDate.get().getCertificate());
+			careGiverUpdateDate.get().setExperience(formDataDTO.getCertificate() != null ? formDataDTO.getExperience()
+					: careGiverUpdateDate.get().getExperience());
 
 			if (formDataDTO.getCareprovider() != null) {
 				for (Long careProExistingList : careGiverUpdateDate.get().getCareprovider()) {
