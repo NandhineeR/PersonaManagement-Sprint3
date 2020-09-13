@@ -40,4 +40,8 @@ public interface CareGiverService {
 
 	CareGiver deleteCareProviderMapping(Long careGiverId, Long careProviderId);
 
+	CareGiver deleteExperience(Long careGiverId, Integer experienceId);
+
+	CareGiver deleteCertificate(Long careGiverId, Integer certificateId);
+
 }

@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -66,6 +69,9 @@ public class CareGiverServiceImpl implements CareGiverService {
 
 	@Autowired
 	IssuingOrganizationRepository issuingOrganizationRepository;
+
+	@PersistenceContext
+	private EntityManager em;
 
 	@Autowired
 	public CareGiverServiceImpl(CategoryRepository categoryRepository, CareGiverRepository careGiverRepository,
@@ -130,25 +136,25 @@ public class CareGiverServiceImpl implements CareGiverService {
 	public CareGiver addCareGiver(FormDataDTO formDataDTO) {
 		CareGiver careGiver = modelMapper.map(formDataDTO, CareGiver.class);
 
-		if(careGiver.getCertificate()!=null) {
-		for (Certificate certificate : careGiver.getCertificate()) {
-			if (certificate.getCertificateId() == 0) {
-				certificateRepository.save(new Certification(certificate.getCertificateName()));
-			}
-			if (certificate.getOrganizationId() == 0) {
-				issuingOrganizationRepository.save(new IssuingOrgranization(certificate.getOrganizationName()));
-			}
-		}
-		}
-		if(careGiver.getExperience()!=null) {
-		for (Experience experience : careGiver.getExperience()) {
-			if (experience.getRoleId() == 0) {
-				roleRepository.save(new Role(experience.getRoleName()));
-			}
-			if (experience.getOrganizationId() == 0) {
-				organizationRepository.save(new Organization(experience.getOrganizationName()));
+		if (careGiver.getCertificate() != null) {
+			for (Certificate certificate : careGiver.getCertificate()) {
+				if (certificate.getCertificateId() == 0 && certificate.getCertificateName() != null) {
+					certificateRepository.save(new Certification(certificate.getCertificateName()));
+				}
+				if (certificate.getOrganizationId() == 0  && certificate.getOrganizationName() != null) {
+					issuingOrganizationRepository.save(new IssuingOrgranization(certificate.getOrganizationName()));
+				}
 			}
 		}
+		if (careGiver.getExperience() != null) {
+			for (Experience experience : careGiver.getExperience()) {
+				if (experience.getRoleId() == 0 && experience.getRoleName() != null) {
+					roleRepository.save(new Role(experience.getRoleName()));
+				}
+				if (experience.getOrganizationId() == 0 && experience.getOrganizationName() != null) {
+					organizationRepository.save(new Organization(experience.getOrganizationName()));
+				}
+			}
 		}
 		if (formDataDTO.getCareprovider() != null) {
 			for (Long careProvider : careGiver.getCareprovider()) {
@@ -181,6 +187,26 @@ public class CareGiverServiceImpl implements CareGiverService {
 	public CareGiver updateCareGiver(FormDataDTO formDataDTO) {
 		Optional<CareGiver> careGiverUpdateDate = careGiverRepository.findById(formDataDTO.getCareGiverId());
 		if (careGiverUpdateDate.isPresent()) {
+			if (formDataDTO.getCertificate() != null) {
+				for (Certificate certificate : formDataDTO.getCertificate()) {
+					if (certificate.getCertificateId() == 0 && certificate.getCertificateName() != null) {
+						certificateRepository.save(new Certification(certificate.getCertificateName()));
+					}
+					if (certificate.getOrganizationId() == 0 && certificate.getOrganizationName() != null) {
+						issuingOrganizationRepository.save(new IssuingOrgranization(certificate.getOrganizationName()));
+					}
+				}
+			}
+			if (formDataDTO.getExperience() != null) {
+				for (Experience experience : formDataDTO.getExperience()) {
+					if (experience.getRoleId() == 0  && experience.getRoleName() != null) {
+						roleRepository.save(new Role(experience.getRoleName()));
+					}
+					if (experience.getOrganizationId() == 0 && experience.getOrganizationName()!= null) {
+						organizationRepository.save(new Organization(experience.getOrganizationName()));
+					}
+				}
+			}
 			careGiverUpdateDate.get()
 					.setActiveStatus(formDataDTO.getActiveStatus() != null ? formDataDTO.getActiveStatus()
 							: careGiverUpdateDate.get().getActiveStatus());
@@ -201,8 +227,9 @@ public class CareGiverServiceImpl implements CareGiverService {
 					formDataDTO.getSkills() != null ? formDataDTO.getSkills() : careGiverUpdateDate.get().getSkills());
 			careGiverUpdateDate.get().setLicenseNo(formDataDTO.getLicenseNo() != null ? formDataDTO.getLicenseNo()
 					: careGiverUpdateDate.get().getLicenseNo());
-			careGiverUpdateDate.get().setSpecialization(formDataDTO.getSpecialization() != null ? formDataDTO.getSpecialization()
-					: careGiverUpdateDate.get().getSpecialization());
+			careGiverUpdateDate.get()
+					.setSpecialization(formDataDTO.getSpecialization() != null ? formDataDTO.getSpecialization()
+							: careGiverUpdateDate.get().getSpecialization());
 			careGiverUpdateDate.get().setCertificate(formDataDTO.getCertificate() != null ? formDataDTO.getCertificate()
 					: careGiverUpdateDate.get().getCertificate());
 			careGiverUpdateDate.get().setExperience(formDataDTO.getCertificate() != null ? formDataDTO.getExperience()
@@ -299,6 +326,50 @@ public class CareGiverServiceImpl implements CareGiverService {
 				}
 			}
 			careGiver.get().setCareprovider(obj);
+			careGiverRepository.save(careGiver.get());
+		}
+		return careGiver.get();
+	}
+
+	@Override
+	public CareGiver deleteExperience(Long careGiverId, Integer experienceId) {
+		Optional<CareGiver> careGiver = careGiverRepository.findById(careGiverId);
+		if (careGiver.isPresent()) {
+			for (Experience experience : careGiver.get().getExperience()) {
+				if (experience.getId() == experienceId) {
+					try {
+						Query q = em.createNativeQuery(
+								"DELETE from tb_giver_experience WHERE (caregiver_caregiver_id = ?1 AND experience_id =?2)");
+						q.setParameter(1, careGiverId);
+						q.setParameter(2, experienceId);
+						q.executeUpdate();
+					} catch (Exception e) {
+						log.error("DeleteExperience Mapping Deleteing Error");
+					}
+				}
+			}
+			careGiverRepository.save(careGiver.get());
+		}
+		return careGiver.get();
+	}
+
+	@Override
+	public CareGiver deleteCertificate(Long careGiverId, Integer certificateId) {
+		Optional<CareGiver> careGiver = careGiverRepository.findById(careGiverId);
+		if (careGiver.isPresent()) {
+			for (Certificate certificate : careGiver.get().getCertificate()) {
+				if (certificate.getId() == certificateId) {
+					try {
+						Query q = em.createNativeQuery(
+								"DELETE from tb_giver_certificate WHERE (caregiver_caregiver_id = ?1 AND certificate_id =?2)");
+						q.setParameter(1, careGiverId);
+						q.setParameter(2, certificateId);
+						q.executeUpdate();
+					} catch (Exception e) {
+						log.error("DeleteCertificate Mapping Deleteing Error");
+					}
+				}
+			}
 			careGiverRepository.save(careGiver.get());
 		}
 		return careGiver.get();

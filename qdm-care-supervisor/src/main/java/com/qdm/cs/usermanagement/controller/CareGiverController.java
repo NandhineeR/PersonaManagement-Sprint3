@@ -105,7 +105,6 @@ public class CareGiverController {
 						categoryList.add(categoryMap);
 					}
 				}
-
 				JSONObject obj = new JSONObject();
 				obj.put("count", careGiver.getClientsCount());
 				obj.put("name", "Clients");
@@ -362,6 +361,42 @@ public class CareGiverController {
 			return response;
 		} catch (Exception e) {
 			log.error("Error Occured At careGiverdetach : " + e.getMessage());
+			response = new ResponseEntity(new ResponseInfo(ResponseType.ERROR.getResponseMessage(),
+					ResponseType.ERROR.getResponseCode(), "Try Again", null), HttpStatus.INTERNAL_SERVER_ERROR);
+			return response;
+		}
+	}
+	
+	@DeleteMapping(value = "delete/experience", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> deleteExperience(@RequestParam("careGiverId") Long careGiverId,
+			@RequestParam("experienceId") Integer experienceId) {
+		ResponseEntity response = null;
+		try {
+			CareGiver careGiver = careGiverService.deleteExperience(careGiverId, experienceId);
+			log.info("Care Giver Experience Deleted Successfully for Experience_Id : " + experienceId);
+			response = new ResponseEntity(new ResponseInfo(ResponseType.SUCCESS.getResponseMessage(),
+					ResponseType.SUCCESS.getResponseCode(), "", null), HttpStatus.CREATED);
+			return response;
+		} catch (Exception e) {
+			log.error("Error Occured At careGiver deleteExperience : " + e.getMessage());
+			response = new ResponseEntity(new ResponseInfo(ResponseType.ERROR.getResponseMessage(),
+					ResponseType.ERROR.getResponseCode(), "Try Again", null), HttpStatus.INTERNAL_SERVER_ERROR);
+			return response;
+		}
+	}
+	
+	@DeleteMapping(value = "delete/certificate", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> deleteECertificate(@RequestParam("careGiverId") Long careGiverId,
+			@RequestParam("certificateId") Integer certificateId) {
+		ResponseEntity response = null;
+		try {
+			CareGiver careGiver = careGiverService.deleteCertificate(careGiverId, certificateId);
+			log.info("Care Giver Certificate Deleted Successfully for Certificate_Id : " + certificateId);
+			response = new ResponseEntity(new ResponseInfo(ResponseType.SUCCESS.getResponseMessage(),
+					ResponseType.SUCCESS.getResponseCode(), "", null), HttpStatus.CREATED);
+			return response;
+		} catch (Exception e) {
+			log.error("Error Occured At careGiver deleteExperience : " + e.getMessage());
 			response = new ResponseEntity(new ResponseInfo(ResponseType.ERROR.getResponseMessage(),
 					ResponseType.ERROR.getResponseCode(), "Try Again", null), HttpStatus.INTERNAL_SERVER_ERROR);
 			return response;
