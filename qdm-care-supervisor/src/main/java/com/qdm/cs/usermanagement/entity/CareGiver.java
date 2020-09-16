@@ -70,7 +70,7 @@ public class CareGiver extends BaseEntity implements Serializable {
 	
 	@OneToMany(fetch = FetchType.LAZY, targetEntity = Specialization.class, cascade = CascadeType.ALL)
 	@JoinColumn(name = "Specialization_Id")
-	@JoinTable(name = "TB_GIVER_SPECIALIZATION")
+	@JoinTable(name = "TB_GIVER_SPECIALIZATIONS")
 	List<Specialization> specialization;
 
 	@OneToMany(fetch = FetchType.LAZY, targetEntity = Certificate.class, cascade = CascadeType.ALL)
